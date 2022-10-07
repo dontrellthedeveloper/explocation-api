@@ -26,11 +26,11 @@ app.get('/', (req, res) => {
     res.send('APP IS RUNNING')
 });
 
-const CONNECTION_URL = 'mongodb+srv://dontrelldev:KNight1990$@cluster0.gpbso8p.mongodb.net/?retryWrites=true&w=majority'
+
 
 const PORT = process.env.PORT|| 3010;
 
-mongoose.connect(CONNECTION_URL, {
+mongoose.connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
