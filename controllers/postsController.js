@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 
 import Post from '../models/Post.js';
+import cloudinary from "../utils/cloudinary.js";
+
 
 const router = express.Router();
 
@@ -9,7 +11,7 @@ export const getPosts = async (req, res) => {
     const { page } = req.query;
 
     try {
-        const LIMIT = 9;
+        const LIMIT = 6;
         const startIndex = (Number(page) - 1) * LIMIT; // get the starting index of every page
 
         const total = await Post.countDocuments({});
@@ -42,7 +44,7 @@ export const getPost = async (req, res) => {
 
     try {
         const post = await Post.findById(id);
-        console.log(post)
+        // console.log(post)
 
         res.status(200).json(post);
     } catch (error) {
@@ -52,14 +54,33 @@ export const getPost = async (req, res) => {
 
 
 export const createPost = async (req, res) => {
-    const post = req.body;
+    // const post = req.body;
+    const {title, message, tags, selectedFile, name} = req.body;
 
-    const newPostMessage = new Post({ ...post, creator: req.userId, createdAt: new Date().toISOString() })
+    const result = await cloudinary.uploader.upload(selectedFile, {
+        folder: "memories"
+    })
+    // console.log('req.body', post)
+    const newPostMessage = new Post({
+        // ...post,
+        title,
+        message,
+        tags,
+        name,
+        selectedFile: {
+            public_id: result.public_id,
+            url: result.secure_url
+
+        },
+        creator:
+        req.userId,
+        createdAt: new Date().toISOString()
+    })
 
 
     try {
         await newPostMessage.save();
-        console.log(newPostMessage)
+        // console.log(newPostMessage)
 
         res.status(201).json(newPostMessage );
     } catch (error) {
